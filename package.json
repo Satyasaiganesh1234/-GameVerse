@@ -1,0 +1,17 @@
+{
+  "name": "gameverse-project",
+  "version": "1.0.0",
+  "description": "GameVerse: Digital Gaming and Exploration Platform — Academic Full-Stack Project",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve": "npx serve public -l 3000"
+  },
+  "dependencies": {
+    "mongoose": "^7.6.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

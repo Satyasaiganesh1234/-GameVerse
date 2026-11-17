@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>GameVerse — Digital Gaming &amp; Exploration Platform</title>
+</head>
+<body data-page="home">
+
+  <!-- Academic Disclaimer Ribbon -->
+  <div class="disclaimer-ribbon">
+    ⚠️ ACADEMIC PROJECT — All ratings, popularity indices, and player counts are illustrative sample data, not live commercial telemetry.
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        <span class="brand-icon">🎮</span>
+        <span>GameVerse</span>
+        <span id="data-source-badge" class="data-badge"></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="explore.html" class="nav-link">Explore</a>
+        <a href="compare.html" class="nav-link">Compare <span class="compare-count">0</span></a>
+        <a href="favorites.html" class="nav-link">Favorites</a>
+        <a href="mongodb.html" class="nav-link">DB Shell</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1 class="hero-title">Discover Your Next<br>Gaming Adventure</h1>
+        <p class="hero-subtitle">Explore 20 legendary games, compare ratings, track your favorites, and dive into the world of gaming analytics.</p>
+        <div class="hero-actions">
+          <a href="explore.html" class="btn btn-primary">🔍 Explore Games</a>
+          <a href="compare.html" class="btn btn-secondary">📊 Compare Games</a>
+          <a href="favorites.html" class="btn btn-accent">💜 My Favorites</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title neon-text">📈 Platform Overview</h2>
+        <div class="stats-grid" id="quick-stats">
+          <div class="stat-card glow-pulse">
+            <div class="stat-icon">🎮</div>
+            <div class="stat-value" id="stat-total-games" data-counter>20</div>
+            <div class="stat-label">Total Games</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value" id="stat-avg-rating" data-counter>9.2</div>
+            <div class="stat-label">Avg Rating</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="stat-total-players" data-counter>7.5M</div>
+            <div class="stat-label">Peak Players</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏷️</div>
+            <div class="stat-value" id="stat-genres" data-counter>15</div>
+            <div class="stat-label">Genres</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Games -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title neon-text">🔥 Featured Games</h2>
+        <div class="game-grid" id="featured-games"></div>
+      </div>
+    </section>
+
+    <!-- Top Rated -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title neon-text">🏆 Top Rated</h2>
+        <div class="game-grid" id="top-rated-games"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">🎮 GameVerse</div>
+      <p class="footer-text">Digital Gaming &amp; Exploration Platform — Academic Project</p>
+      <p class="footer-text">Software Engineering &amp; System Design · 2026</p>
+    </div>
+  </footer>
+  <button id="scroll-top-btn" aria-label="Scroll to top">↑</button>
+
+  <script src="js/catalog-data.js"></script>
+  <script src="js/db-client.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>MongoDB Shell &amp; Asset Manager — GameVerse</title>
+</head>
+<body data-page="mongodb">
+
+  <!-- Academic Disclaimer Ribbon -->
+  <div class="disclaimer-ribbon">
+    ⚠️ ACADEMIC PROJECT — All ratings, popularity indices, and player counts are illustrative sample data, not live commercial telemetry.
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        <span class="brand-icon">🎮</span>
+        <span>GameVerse</span>
+        <span id="data-source-badge" class="data-badge"></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="explore.html" class="nav-link">Explore</a>
+        <a href="compare.html" class="nav-link">Compare <span class="compare-count">0</span></a>
+        <a href="favorites.html" class="nav-link">Favorites</a>
+        <a href="mongodb.html" class="nav-link">DB Shell</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <section class="section">
+      <div class="container">
+        <h1 class="section-title neon-text">🗄️ Interactive MongoDB Shell (mongosh)</h1>
+        <p style="text-align:center; color: var(--text-secondary); margin-bottom: 2rem;">
+          Simulate live queries against the Mongoose Data Layer with real-time JSON BSON output.
+        </p>
+
+        <!-- Interactive Shell Component -->
+        <div class="shell-container">
+          <div class="shell-header">
+            <span class="shell-dot shell-dot-red"></span>
+            <span class="shell-dot shell-dot-yellow"></span>
+            <span class="shell-dot shell-dot-green"></span>
+            <span class="shell-title">GameVerse mongosh — atlas-cluster0.gameverse.net/gameverse_db</span>
+          </div>
+          <div id="shell-output"></div>
+          <div class="shell-input-row">
+            <span>gameverse&gt;</span>
+            <input type="text" id="shell-input" placeholder="db.games.find({ genre: 'RPG' })" autocomplete="off" spellcheck="false">
+            <button class="btn btn-sm btn-primary" id="shell-run" style="border-radius: 0;">Execute</button>
+          </div>
+        </div>
+
+        <!-- Quick Shell Action Toolbar -->
+        <div class="shell-actions">
+          <button class="btn btn-sm btn-accent" id="seed-btn">🌱 Seed Database (/api/seed)</button>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('shell-input').value='db.games.find()'; document.getElementById('shell-run').click();">db.games.find()</button>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('shell-input').value='db.games.count()'; document.getElementById('shell-run').click();">db.games.count()</button>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('shell-input').value='db.favorites.find()'; document.getElementById('shell-run').click();">db.favorites.find()</button>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('shell-input').value='db.stats()'; document.getElementById('shell-run').click();">db.stats()</button>
+          <button class="btn btn-sm btn-secondary" id="shell-clear">🗑️ Clear Terminal</button>
+        </div>
+
+        <!-- Image Asset Manager Section -->
+        <div class="about-section" style="margin-top: 3rem;">
+          <h2 class="neon-text">🖼️ Game Cover Asset &amp; Fallback Manager</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.7;">
+            Inspect how GameVerse's <strong>Multi-Path Image Resolver</strong> searches for local covers in <code>/public/images/</code>, resolves user-provided art, and automatically generates dynamic SVG covers if physical images are missing.
+          </p>
+
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <input type="text" id="asset-search" placeholder="Filter games by title or ID..." style="flex:1; min-width:240px; padding:0.6rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary);">
+            <button class="btn btn-sm btn-secondary" onclick="renderAssetTable()">🔄 Refresh Asset Status</button>
+          </div>
+
+          <div class="compare-table-wrap">
+            <table class="compare-table" id="asset-table">
+              <thead>
+                <tr>
+                  <th>Game ID</th>
+                  <th>Title</th>
+                  <th>Expected Path</th>
+                  <th>Resolution Mode</th>
+                  <th>Visual Preview</th>
+                </tr>
+              </thead>
+              <tbody id="asset-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Mongoose Schemas & BSON Reference -->
+        <div class="about-section" style="margin-top: 2rem;">
+          <h2>📐 Mongoose Schema Architecture</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+            <div class="info-item" style="padding: 1.25rem;">
+              <span class="info-label" style="font-size:0.85rem; color:var(--neon-purple); font-weight:700;">games Collection</span>
+              <pre style="font-family: monospace; font-size: 0.75rem; color: var(--text-secondary); margin-top:0.5rem; white-space:pre-wrap;">
+{
+  _id: ObjectId("..."),
+  gameId: "game-01", // unique index
+  title: String,
+  genre: [String],
+  platform: [String],
+  releaseYear: Number,
+  developer: String,
+  rating: Number, // 0 - 10
+  popularityScore: Number, // 0 - 100
+  peakPlayers: Number,
+  coverImage: String,
+  trailerUrl: String
+}</pre>
+            </div>
+            <div class="info-item" style="padding: 1.25rem;">
+              <span class="info-label" style="font-size:0.85rem; color:var(--neon-cyan); font-weight:700;">favorites Collection</span>
+              <pre style="font-family: monospace; font-size: 0.75rem; color: var(--text-secondary); margin-top:0.5rem; white-space:pre-wrap;">
+{
+  _id: ObjectId("..."),
+  sessionId: String, // indexed
+  gameId: String,
+  addedAt: ISODate("..."),
+  // Compound Unique Index:
+  // (sessionId: 1, gameId: 1)
+}</pre>
+            </div>
+            <div class="info-item" style="padding: 1.25rem;">
+              <span class="info-label" style="font-size:0.85rem; color:var(--neon-green); font-weight:700;">comparisons Collection</span>
+              <pre style="font-family: monospace; font-size: 0.75rem; color: var(--text-secondary); margin-top:0.5rem; white-space:pre-wrap;">
+{
+  _id: ObjectId("..."),
+  sessionId: String, // unique index
+  gameIds: ["game-01", "game-04"],
+  updatedAt: ISODate("...")
+}</pre>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">🎮 GameVerse</div>
+      <p class="footer-text">Digital Gaming &amp; Exploration Platform — Academic Project</p>
+      <p class="footer-text">Software Engineering &amp; System Design · 2026</p>
+    </div>
+  </footer>
+  <button id="scroll-top-btn" aria-label="Scroll to top">↑</button>
+
+  <script src="js/catalog-data.js"></script>
+  <script src="js/db-client.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Asset Manager Renderer
+    function renderAssetTable() {
+      const tbody = document.getElementById('asset-table-body');
+      const search = (document.getElementById('asset-search')?.value || '').toLowerCase();
+      if (!tbody || typeof CATALOG_DATA === 'undefined') return;
+
+      tbody.innerHTML = '';
+      const filtered = CATALOG_DATA.filter(g => 
+        g.title.toLowerCase().includes(search) || 
+        g.gameId.toLowerCase().includes(search)
+      );
+
+      filtered.forEach(game => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><code>${game.gameId}</code></td>
+          <td><strong>${game.title}</strong></td>
+          <td><code style="font-size:0.75rem;">${game.coverImage}</code></td>
+          <td><span class="platform-badge" id="status-${game.gameId}">Inspecting...</span></td>
+          <td>
+            <img id="thumb-${game.gameId}" style="width:45px; height:60px; object-fit:cover; border-radius:4px; border:1px solid var(--border-color);" alt="${game.title}">
+          </td>
+        `;
+        tbody.appendChild(tr);
+
+        const img = tr.querySelector(`#thumb-${game.gameId}`);
+        const statusBadge = tr.querySelector(`#status-${game.gameId}`);
+
+        // Test real image resolution
+        const testImg = new Image();
+        testImg.src = game.coverImage;
+        testImg.onload = () => {
+          img.src = game.coverImage;
+          statusBadge.textContent = 'User Image (Active)';
+          statusBadge.style.color = 'var(--neon-green)';
+          statusBadge.style.borderColor = 'var(--neon-green)';
+        };
+        testImg.onerror = () => {
+          img.src = generateSVGCover(game);
+          statusBadge.textContent = 'Auto SVG Fallback';
+          statusBadge.style.color = 'var(--neon-cyan)';
+          statusBadge.style.borderColor = 'var(--neon-cyan)';
+        };
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAssetTable();
+      document.getElementById('asset-search')?.addEventListener('input', renderAssetTable);
+    });
+  </script>
+</body>
+</html>

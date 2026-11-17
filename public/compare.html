@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <title>Compare Games — GameVerse</title>
+</head>
+<body data-page="compare">
+
+  <div class="disclaimer-ribbon">
+    ⚠️ ACADEMIC PROJECT — All ratings, popularity indices, and player counts are illustrative sample data, not live commercial telemetry.
+  </div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand"><span class="brand-icon">🎮</span><span>GameVerse</span><span id="data-source-badge" class="data-badge"></span></a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+      <div class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="explore.html" class="nav-link">Explore</a>
+        <a href="compare.html" class="nav-link">Compare <span class="compare-count">0</span></a>
+        <a href="favorites.html" class="nav-link">Favorites</a>
+        <a href="mongodb.html" class="nav-link">DB Shell</a>
+        <a href="about.html" class="nav-link">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <section class="section">
+      <div class="container">
+        <h1 class="section-title neon-text">📊 Compare Games</h1>
+
+        <div class="filter-bar" style="margin-bottom: 2rem;">
+          <div class="filter-row">
+            <div class="filter-group" style="flex: 2;">
+              <label for="add-game-select">Add Game to Comparison</label>
+              <select id="add-game-select">
+                <option value="">— Select a game to add —</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn-sm btn-secondary" id="clear-compare">🗑️ Clear All</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="compare-container">
+          <div class="loading-spinner"><div class="spinner"></div><p>Loading comparison...</p></div>
+        </div>
+
+        <div id="compare-charts"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">🎮 GameVerse</div>
+      <p class="footer-text">Digital Gaming &amp; Exploration Platform — Academic Project</p>
+      <p class="footer-text">Software Engineering &amp; System Design · 2026</p>
+    </div>
+  </footer>
+  <button id="scroll-top-btn" aria-label="Scroll to top">↑</button>
+
+  <script src="js/catalog-data.js"></script>
+  <script src="js/db-client.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
