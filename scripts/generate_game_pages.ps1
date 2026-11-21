@@ -1,4 +1,4 @@
-﻿# PowerShell Generator for 20 Dedicated GameVerse Web Pages
+# PowerShell Generator for 20 Dedicated GameVerse Web Pages
 $gamesDir = "c:\Users\marth\.gemini\antigravity\scratch\GameVerse-Project\public\games"
 if (!(Test-Path $gamesDir)) {
     New-Item -ItemType Directory -Path $gamesDir -Force | Out-Null
