@@ -3,55 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <title>Game Details — GameVerse</title>
+  <script>
+    (function() {
+      const SLUGS = {
+        1: 'gta-vi',
+        2: 'uncharted-lost-legacy',
+        3: 'cyberpunk-2077',
+        4: 'rdr2',
+        5: 'black-myth-wukong',
+        6: 'god-of-war',
+        7: '007-first-light',
+        8: 'ghost-of-tsushima',
+        9: 'ac-shadows',
+        10: 'forza-horizon-6',
+        11: 'spider-man-remastered',
+        12: 'last-of-us',
+        13: 'nfs-most-wanted',
+        14: 'gta-vice-city',
+        15: 'ac-mirage',
+        16: 'resident-evil-requiem',
+        17: 'cs2',
+        18: 'project-igi',
+        19: 'minecraft',
+        20: 'tekken-3'
+      };
+      const params = new URLSearchParams(window.location.search);
+      const rawId = params.get('id') || params.get('game');
+      if (rawId) {
+        const idNum = parseInt(rawId, 10);
+        let slug = null;
+        if (!isNaN(idNum) && SLUGS[idNum]) {
+          slug = SLUGS[idNum];
+        } else if (typeof rawId === 'string') {
+          const matchEntry = Object.entries(SLUGS).find(([k, v]) => v.toLowerCase() === rawId.toLowerCase());
+          if (matchEntry) slug = matchEntry[1];
+        }
+        if (slug) {
+          window.location.replace('games/' + slug + '.html');
+          return;
+        }
+      }
+      // If no valid id found, redirect to explore or home
+      window.location.replace('index.html');
+    })();
+  </script>
 </head>
-<body data-page="details">
-
-  <div class="disclaimer-ribbon">
-    ⚠️ ACADEMIC PROJECT — All ratings, popularity indices, and player counts are illustrative sample data, not live commercial telemetry.
-  </div>
-
-  <nav class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="nav-brand"><span class="brand-icon">🎮</span><span>GameVerse</span><span id="data-source-badge" class="data-badge"></span></a>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
-      <div class="nav-menu" id="nav-menu">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="explore.html" class="nav-link">Explore</a>
-        <a href="compare.html" class="nav-link">Compare <span class="compare-count">0</span></a>
-        <a href="favorites.html" class="nav-link">Favorites</a>
-        <a href="mongodb.html" class="nav-link">DB Shell</a>
-        <a href="about.html" class="nav-link">About</a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="main-content">
-    <section class="section">
-      <div class="container">
-        <div id="game-details">
-          <div class="loading-spinner"><div class="spinner"></div><p>Loading game details...</p></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-brand">🎮 GameVerse</div>
-      <p class="footer-text">Digital Gaming &amp; Exploration Platform — Academic Project</p>
-      <p class="footer-text">Software Engineering &amp; System Design · 2026</p>
-    </div>
-  </footer>
-  <button id="scroll-top-btn" aria-label="Scroll to top">↑</button>
-
-  <script src="js/catalog-data.js"></script>
-  <script src="js/db-client.js"></script>
-  <script src="js/app.js"></script>
+<body style="background:#070913; color:#f1f5f9; font-family:sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh;">
+  <p>Redirecting to dedicated game page... <a href="index.html" style="color:#00f2fe;">Click here if not redirected</a>.</p>
 </body>
 </html>

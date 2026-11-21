@@ -55,6 +55,7 @@ const apiHandlers = {
   '/api/favorites': require('./api/favorites'),
   '/api/compare': require('./api/compare'),
   '/api/seed': require('./api/seed'),
+  '/api/auth': require('./api/auth'),
 };
 
 const server = http.createServer(async (req, res) => {
@@ -67,8 +68,8 @@ const server = http.createServer(async (req, res) => {
     if (handler) {
       req.query = parsedUrl.query;
 
-      // Parse JSON body for POST/DELETE
-      if (req.method === 'POST' || req.method === 'DELETE') {
+      // Parse JSON body for POST/PUT/DELETE
+      if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
         req.on('end', async () => {

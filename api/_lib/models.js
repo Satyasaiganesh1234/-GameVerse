@@ -52,9 +52,22 @@ const ComparisonSchema = new mongoose.Schema(
 
 ComparisonSchema.index({ sessionId: 1 }, { unique: true });
 
+/* ─── User Schema (Simple Username Login) ─────────────────────── */
+const UserSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, unique: true, index: true, lowercase: true, trim: true },
+    displayName: { type: String, required: true, trim: true },
+    avatar: { type: String, default: 'fa-gamepad' },
+    favorites: { type: [Number], default: [] },
+    lastLogin: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
 /* ─── Export Models (avoid recompilation on hot reload) ────────── */
 const Game = mongoose.models.Game || mongoose.model('Game', GameSchema);
 const Favorite = mongoose.models.Favorite || mongoose.model('Favorite', FavoriteSchema);
 const Comparison = mongoose.models.Comparison || mongoose.model('Comparison', ComparisonSchema);
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
 
-module.exports = { Game, Favorite, Comparison };
+module.exports = { Game, Favorite, Comparison, User };
