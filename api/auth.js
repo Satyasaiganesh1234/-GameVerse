@@ -32,7 +32,15 @@ module.exports = async function handler(req, res) {
 
   // 1. POST: Login or Register with Username and Password
   if (req.method === 'POST') {
-    const { username, password, action = 'login', displayName, avatar } = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        body = {};
+      }
+    }
+    const { username, password, action = 'login', displayName, avatar } = body || {};
     const rawUsername = (username || '').trim();
     const rawPassword = (password || '').trim();
 
@@ -149,6 +157,9 @@ module.exports = async function handler(req, res) {
         source: 'local-fallback',
         message: `Signed in as ${cleanDisplayName} (Offline Local Mode)`,
         dbNotice: dbError.message,
+        tip: !process.env.MONGODB_URI 
+          ? 'MONGODB_URI is not set in Vercel environment variables. Add it in Vercel Dashboard -> Settings -> Environment Variables.'
+          : 'Check MongoDB Atlas Network Access: whitelist 0.0.0.0/0 to allow Vercel serverless connections.'
       });
     }
   }
@@ -196,7 +207,15 @@ module.exports = async function handler(req, res) {
 
   // 3. PUT: Sync user favorites or update profile in MongoDB Atlas
   if (req.method === 'PUT') {
-    const { username, favorites, displayName } = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        body = {};
+      }
+    }
+    const { username, favorites, displayName } = body || {};
     if (!username) {
       return res.status(400).json({ success: false, error: 'username is required' });
     }

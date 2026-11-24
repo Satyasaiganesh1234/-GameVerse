@@ -1439,7 +1439,11 @@
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userObj));
         closeLoginModal();
         renderAuthHeader();
-        showToast(data.message || `Welcome, ${userObj.displayName}!`, "success");
+        if (data.source === "local-fallback") {
+          showToast(data.message + " — MongoDB not connected on host. Add MONGODB_URI in Vercel settings.", "warning");
+        } else {
+          showToast(data.message || `Welcome, ${userObj.displayName}!`, "success");
+        }
         refreshAllViews();
       } catch (e) {
         const userObj = { username, displayName: username, favorites: favoriteIds };

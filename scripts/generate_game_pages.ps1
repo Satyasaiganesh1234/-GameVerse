@@ -1273,7 +1273,11 @@ foreach ($g in $games) {
         localStorage.setItem(USER_KEY, JSON.stringify(userObj));
         closeLoginModal();
         renderAuthHeader();
-        showToast(data.message || "Welcome, " + (userObj.displayName || username) + "!", "success");
+        if (data.source === "local-fallback") {
+          showToast(data.message + " — MongoDB not connected on host. Add MONGODB_URI in Vercel settings.", "warning");
+        } else {
+          showToast(data.message || "Welcome, " + (userObj.displayName || username) + "!", "success");
+        }
       } catch {
         // Offline fallback
         const userObj = { username, displayName: username };
