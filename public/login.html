@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GameVerse // Neural Ecosystem Authentication Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Free 6.5.1 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Google Fonts: Orbitron (Gaming Display), Share Tech Mono (Cyber Monospace), Inter (UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Orbitron', 'Inter', 'sans-serif'],
+            mono: ['Share Tech Mono', 'monospace'],
+          },
+          colors: {
+            cyber: {
+              bg: '#040711',
+              dark: '#080d1a',
+              card: '#0a1020',
+              cyan: '#00f2fe',
+              neonBlue: '#0284c7',
+              pink: '#ff007f',
+              magenta: '#ec4899',
+              green: '#10b981',
+              border: '#162544',
+            }
+          },
+          boxShadow: {
+            'neon-cyan': '0 0 25px rgba(0, 242, 254, 0.35)',
+            'neon-pink': '0 0 25px rgba(255, 0, 127, 0.35)',
+            'portal': '0 0 60px rgba(0, 242, 254, 0.4), inset 0 0 40px rgba(255, 0, 127, 0.3)',
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Cyber Grid Background */
+    .cyber-grid {
+      background-color: #040711;
+      background-image:
+        linear-gradient(rgba(0, 242, 254, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 254, 0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    /* Ambient Glows */
+    .glow-cyan-blob {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(0, 242, 254, 0.12) 0%, transparent 70%);
+      filter: blur(50px);
+      pointer-events: none;
+    }
+
+    .glow-pink-blob {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 0, 127, 0.15) 0%, transparent 70%);
+      filter: blur(60px);
+      pointer-events: none;
+    }
+
+    /* Sci-Fi Corner Brackets */
+    .corner-bracket {
+      position: relative;
+    }
+
+    .corner-bracket::before,
+    .corner-bracket::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-color: #00f2fe;
+      pointer-events: none;
+    }
+
+    .corner-bracket::before {
+      top: -2px;
+      left: -2px;
+      border-top: 2px solid #00f2fe;
+      border-left: 2px solid #00f2fe;
+    }
+
+    .corner-bracket::after {
+      bottom: -2px;
+      right: -2px;
+      border-bottom: 2px solid #ff007f;
+      border-right: 2px solid #ff007f;
+    }
+
+    /* Portal Animations */
+    @keyframes spinClockwise {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes spinCounterClockwise {
+      from {
+        transform: rotate(360deg);
+      }
+
+      to {
+        transform: rotate(0deg);
+      }
+    }
+
+    @keyframes pulseScale {
+
+      0%,
+      100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.5));
+      }
+
+      50% {
+        transform: scale(1.04);
+        filter: drop-shadow(0 0 45px rgba(255, 0, 127, 0.6));
+      }
+    }
+
+    .animate-spin-slow {
+      animation: spinClockwise 28s linear infinite;
+    }
+
+    .animate-spin-reverse {
+      animation: spinCounterClockwise 20s linear infinite;
+    }
+
+    .animate-pulse-core {
+      animation: pulseScale 4s ease-in-out infinite;
+    }
+
+    /* Scanline Overlay */
+    .scanlines {
+      background: linear-gradient(to bottom,
+          rgba(255, 255, 255, 0),
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.3) 50%,
+          rgba(0, 0, 0, 0.3));
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+
+    /* Custom Checkbox / Toggle */
+    .cyber-toggle:checked+div {
+      background-color: #00f2fe;
+      border-color: #00f2fe;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.7);
+    }
+
+    .cyber-toggle:checked+div .cyber-toggle-dot {
+      transform: translateX(18px);
+      background-color: #040711;
+    }
+
+    /* Shimmer Button */
+    .btn-gradient-glow {
+      background: linear-gradient(135deg, #00f2fe 0%, #a855f7 50%, #ff007f 100%);
+      background-size: 200% 200%;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.4), 0 0 40px rgba(255, 0, 127, 0.25);
+    }
+
+    .btn-gradient-glow:hover {
+      background-position: 100% 100%;
+      box-shadow: 0 0 35px rgba(0, 242, 254, 0.7), 0 0 50px rgba(255, 0, 127, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-gradient-glow:active {
+      transform: translateY(1px);
+    }
+  </style>
+</head>
+
+<body
+  class="cyber-grid text-slate-200 min-h-screen flex flex-col justify-between relative overflow-x-hidden selection:bg-pink-500 selection:text-white">
+
+  <!-- Ambient Background Glows -->
+  <div class="glow-cyan-blob -top-20 -left-20"></div>
+  <div class="glow-pink-blob top-1/3 left-1/4"></div>
+  <div class="glow-cyan-blob -bottom-20 right-10"></div>
+
+  <!-- Scanlines Subtle Layer -->
+  <div class="absolute inset-0 scanlines opacity-40 pointer-events-none z-10"></div>
+
+  <!-- ============================================================== -->
+  <!-- 1. TOP HEADER HUD BAR -->
+  <!-- ============================================================== -->
+  <header
+    class="relative z-20 border-b border-cyber-border/70 bg-cyber-bg/80 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between">
+    <!-- Left: Brand & Version -->
+    <div class="flex items-center gap-3">
+      <div
+        class="w-10 h-10 rounded-lg bg-cyber-dark border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(0,242,254,0.3)]">
+        <i class="fa-solid fa-gamepad text-cyan-400 text-lg"></i>
+      </div>
+      <div>
+        <h1
+          class="font-display font-black tracking-widest text-lg sm:text-xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-300 to-pink-500">
+          GAMEVERSE
+        </h1>
+        <div class="font-mono text-[10px] text-cyan-400/80 tracking-widest -mt-1">
+          NEURAL ECOSYSTEM // V4.2
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Node Status Pill -->
+    <div
+      class="hidden md:flex items-center gap-3 px-4 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/30 font-mono text-xs shadow-[0_0_15px_rgba(0,242,254,0.15)]">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+        <span class="text-cyan-300 font-semibold tracking-wider">NODE: US-EAST-09 // ONLINE</span>
+      </div>
+      <span class="text-slate-600">|</span>
+      <div class="text-slate-400">
+        LATENCY: <span id="header-latency" class="text-cyan-300 font-bold">12ms</span>
+      </div>
+      <span class="text-slate-600">|</span>
+      <div class="text-slate-400">
+        SECURITY: <span class="text-pink-400 font-bold tracking-wider">QUANTUM TLS 1.3</span>
+      </div>
+    </div>
+
+    <!-- Right: Audio & Settings Controls -->
+    <div class="flex items-center gap-2.5">
+      <button id="sound-btn" onclick="toggleAudio()"
+        class="w-9 h-9 rounded-lg bg-cyber-dark border border-slate-700 hover:border-cyan-400/60 text-slate-300 hover:text-cyan-300 transition flex items-center justify-center"
+        title="Toggle Synthesizer Sound FX">
+        <i id="sound-icon" class="fa-solid fa-volume-high text-xs"></i>
+      </button>
+      <button onclick="toggleSettingsModal()"
+        class="w-9 h-9 rounded-lg bg-cyber-dark border border-slate-700 hover:border-pink-400/60 text-slate-300 hover:text-pink-300 transition flex items-center justify-center"
+        title="System Diagnostics">
+        <i class="fa-solid fa-gear text-xs"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================== -->
+  <!-- 2. MAIN WORKSPACE / HERO & LOGIN TERMINAL -->
+  <!-- ============================================================== -->
+  <main class="relative z-20 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 lg:py-12 flex items-center">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
+
+      <!-- LEFT COLUMN: Neural Portal Core & HUD Telemetry -->
+      <div class="lg:col-span-7 flex flex-col justify-center space-y-6">
+
+        <!-- Neural Link Tag -->
+        <div class="inline-flex items-center gap-2">
+          <div
+            class="px-3.5 py-1 rounded-full bg-cyan-950/40 border border-cyan-400/40 font-mono text-xs text-cyan-300 tracking-wider flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f2fe] animate-ping"></span>
+            <span>NEURAL LINK ONLINE // TRANSCENDENCE PROTOCOL</span>
+          </div>
+        </div>
+
+        <!-- Grand Futuristic Headline -->
+        <div class="space-y-1">
+          <h2 class="font-display font-black text-4xl sm:text-6xl text-white tracking-wider leading-none">
+            ENTER THE
+          </h2>
+          <h2
+            class="font-display font-black text-4xl sm:text-6xl tracking-wider leading-none bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-pink-500 drop-shadow-[0_0_35px_rgba(255,0,127,0.4)]">
+            GAMEVERSE
+          </h2>
+        </div>
+
+        <!-- Description -->
+        <p class="text-sm sm:text-base text-slate-400 max-w-xl leading-relaxed">
+          Authenticate your gamer tag to access the quantum neural network and synchronized cloud saves across all
+          metaverses.
+        </p>
+
+        <!-- Quantum Portal Radar Sphere -->
+        <div class="relative py-4 flex flex-col items-center sm:items-start">
+          <div class="flex items-center justify-between w-full max-w-md font-mono text-[11px] text-cyan-400/80 mb-2">
+            <span>GATE: 0X89F7A</span>
+            <span class="text-pink-400/80">HOLOGRAPHIC QUANTUM LINK</span>
+          </div>
+
+          <!-- Radar Sphere Container -->
+          <div class="relative w-64 h-64 sm:w-80 sm:h-80 mx-auto sm:mx-0 flex items-center justify-center">
+
+            <!-- Outer Concentric Rotating Ring (Cyan) -->
+            <div
+              class="absolute inset-0 rounded-full border border-dashed border-cyan-400/40 animate-spin-slow pointer-events-none">
+            </div>
+
+            <!-- Inner Concentric Rotating Ring (Pink/Magenta) -->
+            <div
+              class="absolute inset-4 rounded-full border border-pink-500/50 border-t-transparent border-b-transparent animate-spin-reverse pointer-events-none">
+            </div>
+
+            <!-- Third Ring with Tick Marks -->
+            <div
+              class="absolute inset-8 rounded-full border-2 border-cyan-500/30 shadow-[0_0_30px_rgba(0,242,254,0.25)] pointer-events-none">
+            </div>
+
+            <!-- Radar Crosshairs -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
+              <div class="w-full h-[1px] bg-cyan-400"></div>
+              <div class="h-full w-[1px] bg-cyan-400 absolute"></div>
+            </div>
+
+            <!-- Portal Center: Quantum Core Graphic -->
+            <div
+              class="relative w-44 h-44 sm:w-56 sm:h-56 rounded-full overflow-hidden border-2 border-cyan-400 shadow-[0_0_45px_rgba(0,242,254,0.6)] animate-pulse-core bg-black">
+              <img src="images/quantum-core.jpg" alt="Quantum Neural Core"
+                class="w-full h-full object-cover animate-spin-slow hover:scale-105 transition duration-700"
+                onerror="this.src='https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80'" />
+              <div
+                class="absolute inset-0 bg-gradient-to-tr from-cyan-900/40 via-transparent to-pink-900/40 mix-blend-color-dodge pointer-events-none">
+              </div>
+            </div>
+
+            <!-- Orbiting Particle Accent -->
+            <div class="absolute inset-0 animate-spin-slow pointer-events-none">
+              <div
+                class="w-3 h-3 rounded-full bg-cyan-300 shadow-[0_0_12px_#00f2fe] absolute top-2 left-1/2 -translate-x-1/2">
+              </div>
+            </div>
+            <div class="absolute inset-0 animate-spin-reverse pointer-events-none">
+              <div
+                class="w-2.5 h-2.5 rounded-full bg-pink-400 shadow-[0_0_12px_#ff007f] absolute bottom-4 left-1/3">
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Portal Telemetry -->
+          <div class="flex items-center justify-between w-full max-w-md font-mono text-[11px] text-slate-500 mt-2">
+            <span>SYNAPSE-V9.4</span>
+            <span class="text-cyan-400">FREQ: 142.0 GHZ</span>
+          </div>
+        </div>
+
+        <!-- 3 Metrics HUD Panels -->
+        <div class="grid grid-cols-3 gap-3 max-w-lg pt-2">
+          <!-- Metric 1 -->
+          <div class="rounded-xl bg-cyber-dark/80 border border-cyber-border p-3 corner-bracket">
+            <div class="font-mono text-[10px] text-slate-400 tracking-wider">SYNCED PLAYERS</div>
+            <div id="metric-players" class="font-display font-bold text-base sm:text-lg text-cyan-400 mt-0.5">
+              148,290
+            </div>
+          </div>
+          <!-- Metric 2 -->
+          <div class="rounded-xl bg-cyber-dark/80 border border-cyber-border p-3 corner-bracket">
+            <div class="font-mono text-[10px] text-slate-400 tracking-wider">WORLD SHARDS</div>
+            <div class="font-display font-bold text-base sm:text-lg text-white mt-0.5">
+              1,024 ACTIVE
+            </div>
+          </div>
+          <!-- Metric 3 -->
+          <div class="rounded-xl bg-cyber-dark/80 border border-cyber-border p-3 corner-bracket">
+            <div class="font-mono text-[10px] text-slate-400 tracking-wider">QUANTUM SHIELD</div>
+            <div class="font-display font-bold text-base sm:text-lg text-emerald-400 mt-0.5">
+              OPTIMAL
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Neural Authentication Terminal Card -->
+      <div class="lg:col-span-5 w-full">
+        <div
+          class="rounded-2xl bg-cyber-card/90 border border-cyan-500/30 p-6 sm:p-8 backdrop-blur-xl shadow-[0_0_50px_rgba(0,242,254,0.15)] corner-bracket relative">
+
+          <!-- Card Header HUD -->
+          <div class="flex items-center justify-between pb-6 border-b border-cyber-border font-mono text-xs">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f2fe] animate-pulse"></span>
+              <span class="text-cyan-300 font-semibold tracking-wider">PORTAL: READY // SECURE</span>
+            </div>
+            <div class="text-pink-400 font-mono tracking-wider">
+              NODE: US-EAST-09
+            </div>
+          </div>
+
+          <!-- Mode Title / Switch Tabs -->
+          <div class="pt-5 pb-4 flex items-center justify-between">
+            <h3 id="form-heading" class="font-display font-bold text-lg text-white tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-terminal text-cyan-400 text-sm"></i>
+              <span>AUTHENTICATION TERMINAL</span>
+            </h3>
+            <span id="mode-badge"
+              class="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/40 text-[10px] font-mono text-cyan-300 uppercase">
+              LOGIN MODE
+            </span>
+          </div>
+
+          <!-- Alert / Status Notice Box -->
+          <div id="auth-alert"
+            class="hidden mb-4 p-3 rounded-xl border text-xs font-mono transition-all duration-300 flex items-start gap-2.5">
+            <i id="auth-alert-icon" class="fa-solid fa-circle-exclamation mt-0.5 text-sm"></i>
+            <div class="flex-1" id="auth-alert-msg">Status message</div>
+          </div>
+
+          <!-- Authentication Form -->
+          <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+
+            <!-- Optional: Display Name / Callsign (Only visible in Register Mode) -->
+            <div id="displayname-group" class="hidden space-y-1.5">
+              <div class="flex items-center justify-between font-mono text-[11px]">
+                <label for="displayname-input" class="text-slate-300 font-semibold tracking-wider">
+                  CALLSIGN / DISPLAY NAME
+                </label>
+                <span class="text-pink-400">OPTIONAL</span>
+              </div>
+              <div class="relative">
+                <i class="fa-solid fa-signature absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                <input type="text" id="displayname-input" placeholder="e.g. NeoVanguard"
+                  class="w-full pl-9 pr-4 py-3 rounded-xl bg-cyber-dark border border-slate-700 focus:border-pink-400 focus:ring-1 focus:ring-pink-400 text-sm text-white placeholder-slate-600 font-mono transition outline-none" />
+              </div>
+            </div>
+
+            <!-- 1. Gamer Tag / Neural ID (Username) -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between font-mono text-[11px]">
+                <label for="username-input" class="text-slate-300 font-semibold tracking-wider">
+                  GAMER TAG / NEURAL ID
+                </label>
+                <span class="text-cyan-400">ID // REQUIRED</span>
+              </div>
+              <div class="relative corner-bracket">
+                <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400 text-xs"></i>
+                <input type="text" id="username-input" required minlength="3" autocomplete="username"
+                  placeholder="CyberVanguard#2077"
+                  class="w-full pl-9 pr-4 py-3 rounded-xl bg-cyber-dark border border-slate-700 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 text-sm text-white placeholder-slate-600 font-mono tracking-wider transition outline-none shadow-inner" />
+              </div>
+            </div>
+
+            <!-- 2. Access Key / Password -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between font-mono text-[11px]">
+                <label for="password-input" class="text-slate-300 font-semibold tracking-wider">
+                  ACCESS KEY / PASSWORD
+                </label>
+                <button type="button" onclick="handleForgotPassword()"
+                  class="text-pink-400 hover:text-pink-300 transition hover:underline">
+                  FORGOT KEY?
+                </button>
+              </div>
+              <div class="relative corner-bracket">
+                <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 text-xs"></i>
+                <input type="password" id="password-input" required minlength="4" autocomplete="current-password"
+                  placeholder="••••••••••••••••"
+                  class="w-full pl-9 pr-10 py-3 rounded-xl bg-cyber-dark border border-slate-700 focus:border-pink-400 focus:ring-1 focus:ring-pink-400 text-sm text-white placeholder-slate-600 font-mono tracking-widest transition outline-none shadow-inner" />
+                <button type="button" onclick="togglePasswordVisibility()"
+                  class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-cyan-400 transition"
+                  title="Toggle Password Visibility">
+                  <i id="password-eye-icon" class="fa-regular fa-eye text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Controls Row: Toggle Stay Connected & Latency -->
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                <input type="checkbox" id="stay-connected-toggle" checked class="sr-only cyber-toggle" />
+                <div
+                  class="w-10 h-5 rounded-full bg-slate-800 border border-slate-600 transition duration-300 flex items-center p-0.5">
+                  <div
+                    class="cyber-toggle-dot w-4 h-4 rounded-full bg-cyan-400 transition duration-300 shadow-[0_0_8px_#00f2fe]">
+                  </div>
+                </div>
+                <span class="text-xs font-mono text-slate-300 tracking-wider">Stay Connected &amp; Synced</span>
+              </label>
+
+              <div class="font-mono text-xs text-cyan-400 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>LATENCY: <strong id="form-latency">14ms</strong></span>
+              </div>
+            </div>
+
+            <!-- Primary Glowing Button -->
+            <div class="pt-3">
+              <button type="submit" id="submit-btn"
+                class="w-full py-3.5 px-6 rounded-xl btn-gradient-glow text-white font-display font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 group">
+                <span id="btn-text">INITIALIZE LOGIN</span>
+                <i id="btn-icon" class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition text-xs"></i>
+              </button>
+            </div>
+          </form>
+
+          <!-- Divider: Connect with Gamer Network -->
+          <div class="relative my-6 text-center">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-slate-800"></div>
+            </div>
+            <span
+              class="relative px-3 bg-cyber-card font-mono text-[10px] text-slate-500 uppercase tracking-widest">
+              OR CONNECT WITH GAMER NETWORK
+            </span>
+          </div>
+
+          <!-- Social Gamer Network Buttons -->
+          <div class="grid grid-cols-5 gap-2.5">
+            <!-- Discord -->
+            <button onclick="handleSocialAuth('Discord')"
+              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-indigo-400 text-slate-400 hover:text-indigo-400 transition hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] flex items-center justify-center"
+              title="Authenticate via Discord">
+              <i class="fa-brands fa-discord text-base"></i>
+            </button>
+            <!-- Steam -->
+            <button onclick="handleSocialAuth('Steam')"
+              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-cyan-400 text-slate-400 hover:text-cyan-400 transition hover:shadow-[0_0_15px_rgba(0,242,254,0.3)] flex items-center justify-center"
+              title="Authenticate via Steam">
+              <i class="fa-brands fa-steam text-base"></i>
+            </button>
+            <!-- Twitch -->
+            <button onclick="handleSocialAuth('Twitch')"
+              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-purple-400 text-slate-400 hover:text-purple-400 transition hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] flex items-center justify-center"
+              title="Authenticate via Twitch">
+              <i class="fa-brands fa-twitch text-base"></i>
+            </button>
+            <!-- PlayStation Network -->
+            <button onclick="handleSocialAuth('PlayStation')"
+              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-blue-400 text-slate-400 hover:text-blue-400 transition hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] flex items-center justify-center"
+              title="Authenticate via PlayStation Network">
+              <i class="fa-brands fa-playstation text-base"></i>
+            </button>
+            <!-- Google -->
+            <button onclick="handleSocialAuth('Google')"
+              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-pink-400 text-slate-400 hover:text-pink-400 transition hover:shadow-[0_0_15px_rgba(255,0,127,0.3)] flex items-center justify-center"
+              title="Authenticate via Google">
+              <i class="fa-brands fa-google text-base"></i>
+            </button>
+          </div>
+
+          <!-- Bottom Switch Link: Register / Login Toggle -->
+          <div class="mt-6 text-center font-mono text-xs">
+            <span id="switch-prompt" class="text-slate-400">New Player?</span>
+            <button type="button" id="switch-btn" onclick="toggleAuthMode()"
+              class="text-cyan-400 hover:text-pink-400 font-bold ml-1.5 transition underline decoration-cyan-400/50 hover:decoration-pink-400">
+              INITIALIZE AVATAR &rarr;
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- 3. BOTTOM FOOTER TELEMETRY -->
+  <!-- ============================================================== -->
+  <footer
+    class="relative z-20 border-t border-cyber-border/70 bg-cyber-bg/90 backdrop-blur-md px-4 sm:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-[11px] text-slate-500">
+    <div class="flex items-center gap-2">
+      <span class="text-cyan-400 font-semibold">VER 4.2.0-STABLE</span>
+      <span>&bull;</span>
+      <span>SERVERS: <strong class="text-emerald-400">99.98% OPERATIONAL</strong></span>
+      <span>&bull;</span>
+      <span class="hidden md:inline">TLS 1.3 QUANTUM ENCRYPTED</span>
+    </div>
+
+    <div class="flex items-center gap-4 text-slate-400">
+      <a href="javascript:void(0)" onclick="alert('GameVerse Terminal Protocol Terms: All gamer neural records are cryptographically secured.')" class="hover:text-cyan-300 transition">TERMINAL TERMS</a>
+      <a href="javascript:void(0)" onclick="alert('Data Privacy: Zero plain-text passwords stored. PBKDF2 SHA-512 with per-user salt.')" class="hover:text-cyan-300 transition">DATA PRIVACY</a>
+      <a href="javascript:void(0)" onclick="alert('Anti-Cheat 4.0: Quantum hash verification active on all endpoints.')" class="hover:text-cyan-300 transition">ANTI-CHEAT 4.0</a>
+      <span class="text-slate-600">|</span>
+      <span class="text-cyan-400 font-semibold cursor-pointer">REGION: GLOBAL-1 <i class="fa-solid fa-chevron-down text-[9px] ml-0.5"></i></span>
+    </div>
+  </footer>
+
+  <!-- ============================================================== -->
+  <!-- 4. CLIENT JAVASCRIPT & AUTHENTICATION ENGINE -->
+  <!-- ============================================================== -->
+  <script>
+    // Configuration & Target Redirection
+    const TARGET_REDIRECT_URL = "https://game-verse-rouge.vercel.app/";
+    const USER_STORAGE_KEY = "gameverse_user";
+
+    // Application State
+    let currentAuthMode = "login"; // 'login' | 'register'
+    let audioEnabled = false;
+    let audioCtx = null;
+
+    // Web Audio Synthesizer for Cyber SFX
+    function playCyberSfx(type = 'beep') {
+      if (!audioEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        if (type === 'beep') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        } else if (type === 'success') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+          osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc.start(now);
+          osc.stop(now + 0.45);
+        } else if (type === 'error') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {
+        // AudioContext not allowed or not supported
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const icon = document.getElementById("sound-icon");
+      if (icon) {
+        icon.className = audioEnabled ? "fa-solid fa-volume-high text-cyan-400" : "fa-solid fa-volume-xmark text-slate-500";
+      }
+      if (audioEnabled) {
+        playCyberSfx('beep');
+        showAlert("Neural Audio Interface Activated", "info");
+      } else {
+        showAlert("Neural Audio Interface Muted", "info");
+      }
+    }
+
+    // Toggle Password Visibility
+    function togglePasswordVisibility() {
+      const pInput = document.getElementById("password-input");
+      const eyeIcon = document.getElementById("password-eye-icon");
+      if (!pInput || !eyeIcon) return;
+      const isPassword = pInput.type === "password";
+      pInput.type = isPassword ? "text" : "password";
+      eyeIcon.className = isPassword ? "fa-regular fa-eye-slash text-pink-400" : "fa-regular fa-eye text-slate-500";
+      playCyberSfx('beep');
+    }
+
+    // Switch between Login and Register modes
+    function toggleAuthMode() {
+      currentAuthMode = (currentAuthMode === "login") ? "register" : "login";
+      const heading = document.getElementById("form-heading");
+      const modeBadge = document.getElementById("mode-badge");
+      const displayNameGroup = document.getElementById("displayname-group");
+      const btnText = document.getElementById("btn-text");
+      const switchPrompt = document.getElementById("switch-prompt");
+      const switchBtn = document.getElementById("switch-btn");
+
+      playCyberSfx('beep');
+      hideAlert();
+
+      if (currentAuthMode === "register") {
+        if (heading) heading.innerHTML = `<i class="fa-solid fa-user-plus text-pink-400 text-sm"></i><span>INITIALIZE AVATAR</span>`;
+        if (modeBadge) {
+          modeBadge.textContent = "NEW OPERATIVE";
+          modeBadge.className = "px-2 py-0.5 rounded bg-pink-950/60 border border-pink-500/40 text-[10px] font-mono text-pink-300 uppercase";
+        }
+        if (displayNameGroup) displayNameGroup.classList.remove("hidden");
+        if (btnText) btnText.textContent = "REGISTER NEURAL ID";
+        if (switchPrompt) switchPrompt.textContent = "Existing Operative?";
+        if (switchBtn) switchBtn.innerHTML = "RETURN TO LOGIN &rarr;";
+      } else {
+        if (heading) heading.innerHTML = `<i class="fa-solid fa-terminal text-cyan-400 text-sm"></i><span>AUTHENTICATION TERMINAL</span>`;
+        if (modeBadge) {
+          modeBadge.textContent = "LOGIN MODE";
+          modeBadge.className = "px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/40 text-[10px] font-mono text-cyan-300 uppercase";
+        }
+        if (displayNameGroup) displayNameGroup.classList.add("hidden");
+        if (btnText) btnText.textContent = "INITIALIZE LOGIN";
+        if (switchPrompt) switchPrompt.textContent = "New Player?";
+        if (switchBtn) switchBtn.innerHTML = "INITIALIZE AVATAR &rarr;";
+      }
+    }
+
+    // Show Custom Cyber Alert
+    function showAlert(message, type = "error") {
+      const box = document.getElementById("auth-alert");
+      const msg = document.getElementById("auth-alert-msg");
+      const icon = document.getElementById("auth-alert-icon");
+      if (!box || !msg || !icon) return;
+
+      box.classList.remove("hidden", "bg-rose-950/50", "border-rose-500/50", "text-rose-300", "bg-emerald-950/50", "border-emerald-500/50", "text-emerald-300", "bg-cyan-950/50", "border-cyan-500/50", "text-cyan-300");
+
+      if (type === "error") {
+        box.classList.add("bg-rose-950/50", "border-rose-500/50", "text-rose-300");
+        icon.className = "fa-solid fa-triangle-exclamation text-rose-400 mt-0.5 text-sm";
+      } else if (type === "success") {
+        box.classList.add("bg-emerald-950/50", "border-emerald-500/50", "text-emerald-300");
+        icon.className = "fa-solid fa-circle-check text-emerald-400 mt-0.5 text-sm";
+      } else {
+        box.classList.add("bg-cyan-950/50", "border-cyan-500/50", "text-cyan-300");
+        icon.className = "fa-solid fa-circle-info text-cyan-400 mt-0.5 text-sm";
+      }
+
+      msg.innerHTML = message;
+    }
+
+    function hideAlert() {
+      const box = document.getElementById("auth-alert");
+      if (box) box.classList.add("hidden");
+    }
+
+    function handleForgotPassword() {
+      playCyberSfx('beep');
+      showAlert("To reset quantum credentials, please register a new neural ID or contact: admin@gameverse.metaverse", "info");
+    }
+
+    function handleSocialAuth(provider) {
+      playCyberSfx('beep');
+      const uInput = document.getElementById("username-input");
+      const pInput = document.getElementById("password-input");
+      if (uInput) uInput.value = `${provider}_Gamer#${Math.floor(1000 + Math.random() * 9000)}`;
+      if (pInput) pInput.value = "QuantumAuth2026!";
+      showAlert(`Authenticated via ${provider} Gamer Network. Ready to Initialize Login.`, "info");
+    }
+
+    function toggleSettingsModal() {
+      playCyberSfx('beep');
+      showAlert("System Diagnostics: MongoDB Atlas Cluster Live (AWS Mumbai ap-south-1). Vercel Node Engine 18+ active.", "info");
+    }
+
+    // MAIN AUTHENTICATION & STRICT REDIRECTION LOGIC
+    async function handleAuthSubmit(event) {
+      event.preventDefault();
+
+      const uInput = document.getElementById("username-input");
+      const pInput = document.getElementById("password-input");
+      const dInput = document.getElementById("displayname-input");
+      const submitBtn = document.getElementById("submit-btn");
+      const btnText = document.getElementById("btn-text");
+      const btnIcon = document.getElementById("btn-icon");
+
+      const username = uInput ? uInput.value.trim() : "";
+      const password = pInput ? pInput.value : "";
+      const displayName = dInput ? dInput.value.trim() : username;
+
+      if (!username || username.length < 3) {
+        playCyberSfx('error');
+        showAlert("GAMER TAG INVALID: Must be at least 3 characters.", "error");
+        if (uInput) uInput.focus();
+        return;
+      }
+
+      if (!password || password.length < 4) {
+        playCyberSfx('error');
+        showAlert("ACCESS KEY INVALID: Must be at least 4 characters.", "error");
+        if (pInput) pInput.focus();
+        return;
+      }
+
+      // Enter Loading State
+      if (submitBtn) submitBtn.disabled = true;
+      if (btnText) btnText.textContent = "SYNAPSE HANDSHAKE...";
+      if (btnIcon) btnIcon.className = "fa-solid fa-spinner fa-spin text-xs";
+      showAlert("Establishing neural quantum handshake with MongoDB Atlas...", "info");
+      playCyberSfx('beep');
+
+      try {
+        const payload = {
+          username,
+          password,
+          action: currentAuthMode,
+          displayName: displayName || username
+        };
+
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        let data;
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          throw new Error(`Server returned HTTP ${res.status}. Check Vercel serverless function logs.`);
+        }
+
+        // FAILURE HANDLING: Do NOT redirect on failure
+        if (!res.ok || !data.success) {
+          playCyberSfx('error');
+          showAlert(data.error || "ACCESS DENIED: Authentication handshake failed.", "error");
+          if (submitBtn) submitBtn.disabled = false;
+          if (btnText) btnText.textContent = (currentAuthMode === "register") ? "REGISTER NEURAL ID" : "INITIALIZE LOGIN";
+          if (btnIcon) btnIcon.className = "fa-solid fa-arrow-right group-hover:translate-x-1.5 transition text-xs";
+          return;
+        }
+
+        // SUCCESS HANDLING: Verified in MongoDB Atlas!
+        playCyberSfx('success');
+        const userObj = data.user || { username, displayName: displayName || username };
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userObj));
+
+        showAlert(
+          `<strong>ACCESS GRANTED // NEURAL LINK VERIFIED!</strong><br/>Welcome operative <strong>${userObj.displayName || userObj.username}</strong>. Transferring to GameVerse Metaverse...`,
+          "success"
+        );
+
+        if (btnText) btnText.textContent = "TRANSFERRING TO METAVERSE...";
+        if (btnIcon) btnIcon.className = "fa-solid fa-circle-check text-emerald-400";
+
+        // REDIRECT STRICTLY TO https://game-verse-rouge.vercel.app/
+        setTimeout(() => {
+          // If we are on localhost, redirecting to TARGET_REDIRECT_URL (or if the user wants live link)
+          window.location.href = TARGET_REDIRECT_URL;
+        }, 1100);
+
+      } catch (err) {
+        console.error("Authentication Error:", err);
+        playCyberSfx('error');
+        showAlert(`CONNECTION ERROR: ${err.message || 'Failed to reach GameVerse auth endpoint.'}`, "error");
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnText) btnText.textContent = (currentAuthMode === "register") ? "REGISTER NEURAL ID" : "INITIALIZE LOGIN";
+        if (btnIcon) btnIcon.className = "fa-solid fa-arrow-right group-hover:translate-x-1.5 transition text-xs";
+      }
+    }
+
+    // Dynamic Latency & Player count jitter for realism
+    setInterval(() => {
+      const lat = Math.floor(10 + Math.random() * 5);
+      const hLat = document.getElementById("header-latency");
+      const fLat = document.getElementById("form-latency");
+      if (hLat) hLat.textContent = `${lat}ms`;
+      if (fLat) fLat.textContent = `${lat + 2}ms`;
+    }, 4000);
+  </script>
+</body>
+
+</html>

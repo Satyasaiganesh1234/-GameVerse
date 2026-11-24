@@ -1354,6 +1354,15 @@
 
     const FAVORITES_STORAGE_KEY = "gameverse_favorites_v1"; let favoriteIds = []; let currentPage = "home"; let currentExploreGenre = "ALL"; let compareSelectedIds = [1, 3, 4, 5, 19]; let heroSpotlightIndex = 0; let compareBarChartInstance = null; let compareRatingChartInstance = null;
     const USER_STORAGE_KEY = "gameverse_user";
+    // Authentication Gate: if user is not authenticated, redirect to login portal
+    (function enforceAuthGate() {
+      try {
+        const raw = localStorage.getItem("gameverse_user");
+        if (!raw) {
+          window.location.replace("login.html");
+        }
+      } catch (e) {}
+    })();
     let currentAuthMode = "login";
 
     function setAuthMode(mode) {
@@ -1460,7 +1469,14 @@
       }
     }
 
-    function handleLogout() { localStorage.removeItem(USER_STORAGE_KEY); renderAuthHeader(); showToast("Signed out of GameVerse", "info") }
+    function handleLogout() { 
+      localStorage.removeItem(USER_STORAGE_KEY); 
+      renderAuthHeader(); 
+      showToast("Signed out of GameVerse", "info");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 400);
+    }
 
     function syncFavoritesWithBackend(favs, username) { const user = getCurrentUser(); const uName = username || (user ? user.username : null); if (!uName) return; fetch("/api/auth", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: uName, favorites: favs }) }).catch(() => { }) }
 

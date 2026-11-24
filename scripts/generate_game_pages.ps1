@@ -1297,6 +1297,9 @@ foreach ($g in $games) {
       localStorage.removeItem(USER_KEY);
       renderAuthHeader();
       showToast("Signed out of GameVerse", "info");
+      setTimeout(() => {
+        window.location.href = "../login.html";
+      }, 400);
     }
 
     function showToast(message, type = "info") {
