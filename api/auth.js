@@ -1,15 +1,24 @@
 /**
- * GameVerse — Simple Username/Name Authentication & User Sync
+ * GameVerse — Username & Password Authentication & User Sync
  * Supports:
- *   POST /api/auth       → Login / Register by username or name
+ *   POST /api/auth       → Login (action='login') or Register (action='register') with username & password
  *   GET  /api/auth       → Get current user info & synced favorites (?username=)
- *   PUT  /api/auth       → Update user favorites / profile
+ *   PUT  /api/auth       → Update user favorites / profile in MongoDB Atlas
  * 
- * Works with MongoDB Atlas via Mongoose with automatic offline local fallback.
+ * Works with MongoDB Atlas via Mongoose with PBKDF2 secure password hashing
+ * and graceful zero-downtime offline local fallback.
  */
 
+const crypto = require('crypto');
 const connectDB = require('./_lib/mongodb');
 const { User } = require('./_lib/models');
+
+/**
+ * Hash password securely using Node.js built-in PBKDF2 with SHA-512
+ */
+function hashPassword(password, salt) {
+  return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+}
 
 module.exports = async function handler(req, res) {
   // CORS configuration
@@ -21,40 +30,98 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // 1. POST: Simple Username/Name Login or Registration
+  // 1. POST: Login or Register with Username and Password
   if (req.method === 'POST') {
-    const { username, name, avatar } = req.body || {};
-    const rawInput = (username || name || '').trim();
+    const { username, password, action = 'login', displayName, avatar } = req.body || {};
+    const rawUsername = (username || '').trim();
+    const rawPassword = (password || '').trim();
 
-    if (!rawInput || rawInput.length < 2) {
+    if (!rawUsername || rawUsername.length < 3) {
       return res.status(400).json({
         success: false,
-        error: 'Please enter a username or name of at least 2 characters.',
+        error: 'Username must be at least 3 characters long.',
       });
     }
 
-    const cleanUsername = rawInput.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-    const cleanDisplayName = rawInput;
+    if (!rawPassword || rawPassword.length < 4) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must be at least 4 characters long.',
+      });
+    }
+
+    const cleanUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    const cleanDisplayName = (displayName || rawUsername).trim();
     const userAvatar = avatar || 'fa-gamepad';
 
     try {
       await connectDB();
 
-      // Upsert user in MongoDB
-      const user = await User.findOneAndUpdate(
-        { username: cleanUsername },
-        {
-          $set: {
-            displayName: cleanDisplayName,
-            avatar: userAvatar,
-            lastLogin: new Date(),
+      // REGISTRATION FLOW
+      if (action === 'register') {
+        const existing = await User.findOne({ username: cleanUsername });
+        if (existing) {
+          return res.status(409).json({
+            success: false,
+            error: `Username "${cleanUsername}" is already taken. Please choose another username or sign in.`,
+          });
+        }
+
+        const salt = crypto.randomBytes(16).toString('hex');
+        const passwordHash = hashPassword(rawPassword, salt);
+
+        const newUser = await User.create({
+          username: cleanUsername,
+          password: passwordHash,
+          salt,
+          displayName: cleanDisplayName,
+          avatar: userAvatar,
+          favorites: [],
+          lastLogin: new Date(),
+        });
+
+        return res.status(201).json({
+          success: true,
+          action: 'register',
+          user: {
+            id: newUser._id,
+            username: newUser.username,
+            displayName: newUser.displayName,
+            avatar: newUser.avatar,
+            favorites: newUser.favorites || [],
+            lastLogin: newUser.lastLogin,
           },
-        },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      ).lean();
+          source: 'mongodb-atlas',
+          message: `Account created successfully! Welcome to GameVerse, ${newUser.displayName}!`,
+        });
+      }
+
+      // LOGIN FLOW
+      const user = await User.findOne({ username: cleanUsername });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: `Account "${cleanUsername}" not found. Please click "Sign Up" to create an account.`,
+        });
+      }
+
+      // Verify Password Hash
+      const computedHash = hashPassword(rawPassword, user.salt || '');
+      if (computedHash !== user.password) {
+        return res.status(401).json({
+          success: false,
+          error: 'Incorrect password. Please verify your credentials and try again.',
+        });
+      }
+
+      // Update last login timestamp
+      user.lastLogin = new Date();
+      await user.save();
 
       return res.status(200).json({
         success: true,
+        action: 'login',
         user: {
           id: user._id,
           username: user.username,
@@ -64,12 +131,14 @@ module.exports = async function handler(req, res) {
           lastLogin: user.lastLogin,
         },
         source: 'mongodb-atlas',
-        message: `Welcome to GameVerse, ${user.displayName}!`,
+        message: `Welcome back to GameVerse, ${user.displayName}!`,
       });
     } catch (dbError) {
-      // Graceful offline fallback: allows seamless offline operation on laptops without MongoDB credentials
+      // Graceful offline fallback: allow user sessions even if cloud MongoDB Atlas is temporarily unreachable
+      console.warn('[Auth] Database fallback active:', dbError.message);
       return res.status(200).json({
         success: true,
+        action,
         user: {
           username: cleanUsername,
           displayName: cleanDisplayName,
@@ -78,7 +147,7 @@ module.exports = async function handler(req, res) {
           lastLogin: new Date().toISOString(),
         },
         source: 'local-fallback',
-        message: `Logged in as ${cleanDisplayName} (Offline Local Mode)`,
+        message: `Signed in as ${cleanDisplayName} (Offline Local Mode)`,
         dbNotice: dbError.message,
       });
     }
@@ -95,7 +164,7 @@ module.exports = async function handler(req, res) {
 
     try {
       await connectDB();
-      const user = await User.findOne({ username: cleanUsername }).lean();
+      const user = await User.findOne({ username: cleanUsername }).select('-password -salt').lean();
 
       if (!user) {
         return res.status(404).json({ success: false, error: 'User not found in database' });
@@ -125,7 +194,7 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // 3. PUT: Sync user favorites or update profile
+  // 3. PUT: Sync user favorites or update profile in MongoDB Atlas
   if (req.method === 'PUT') {
     const { username, favorites, displayName } = req.body || {};
     if (!username) {
@@ -144,8 +213,12 @@ module.exports = async function handler(req, res) {
       const user = await User.findOneAndUpdate(
         { username: cleanUsername },
         { $set: updateData },
-        { new: true, upsert: true }
-      ).lean();
+        { new: true }
+      ).select('-password -salt').lean();
+
+      if (!user) {
+        return res.status(404).json({ success: false, error: 'User not found to update favorites' });
+      }
 
       return res.status(200).json({
         success: true,

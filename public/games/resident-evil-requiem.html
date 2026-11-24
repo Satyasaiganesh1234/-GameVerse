@@ -328,38 +328,71 @@
 
   </main>
 
-  <!-- LOGIN MODAL -->
+  <!-- LOGIN & REGISTRATION MODAL -->
   <div id="login-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md overflow-y-auto p-4 flex items-center justify-center" onclick="if(event.target === this) closeLoginModal()">
-    <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-8 border border-cyan-500/40 shadow-2xl space-y-6 my-auto">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-8 border border-cyan-500/40 shadow-2xl space-y-5 my-auto">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <span class="text-xs font-semibold uppercase tracking-wider text-cyan-400 block mb-1">Simple Sign In</span>
-          <h3 class="font-display font-bold text-2xl text-white">Enter GameVerse</h3>
+          <span id="auth-modal-badge" class="text-xs font-semibold uppercase tracking-wider text-cyan-400 block mb-1">Account Access</span>
+          <h3 id="auth-modal-title" class="font-display font-bold text-2xl text-white">Sign In to GameVerse</h3>
         </div>
-        <button onclick="closeLoginModal()" class="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 flex items-center justify-center">
+        <button onclick="closeLoginModal()" class="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 flex items-center justify-center transition">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <p class="text-xs text-slate-300">
-        Enter your username or gamer name. No password required — your profile and favorites sync directly to the Vercel/MongoDB database with zero-downtime offline support!
+
+      <!-- Auth Mode Switch Tabs: Sign In vs Sign Up -->
+      <div class="flex rounded-xl bg-slate-900/90 p-1 border border-slate-800">
+        <button id="auth-tab-login" type="button" onclick="setAuthMode('login')" class="flex-1 py-2 rounded-lg text-xs font-bold transition text-cyan-300 bg-cyan-500/20 border border-cyan-500/30">
+          <i class="fa-solid fa-arrow-right-to-bracket mr-1.5"></i> Sign In
+        </button>
+        <button id="auth-tab-register" type="button" onclick="setAuthMode('register')" class="flex-1 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-user-plus mr-1.5"></i> Create Account
+        </button>
+      </div>
+
+      <p id="auth-modal-desc" class="text-xs text-slate-300 leading-relaxed">
+        Sign in with your username and password to sync your favorites and profile with the MongoDB Atlas database.
       </p>
+
       <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
         <div>
-          <label for="username-input" class="block text-xs font-semibold text-slate-300 mb-1.5">Username or Gamer Name</label>
+          <label for="username-input" class="block text-xs font-semibold text-slate-300 mb-1.5">Username</label>
           <div class="relative">
             <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input 
               type="text" 
               id="username-input" 
-              placeholder="e.g. Alex, NeonPlayer, Satyasaiganesh" 
+              placeholder="e.g. Satyasaiganesh, CyberGamer" 
               required 
-              minlength="2"
+              minlength="3"
+              autocomplete="username"
               class="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition"
             />
           </div>
         </div>
-        <button type="submit" class="w-full neon-btn-primary py-3 rounded-xl font-bold text-sm text-slate-950 flex items-center justify-center gap-2">
-          <i class="fa-solid fa-right-to-bracket"></i> Sign In &amp; Sync Profile
+
+        <div>
+          <label for="password-input" class="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input 
+              type="password" 
+              id="password-input" 
+              placeholder="Enter password (min 4 characters)" 
+              required 
+              minlength="4"
+              autocomplete="current-password"
+              class="w-full pl-9 pr-10 py-3 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition"
+            />
+            <button type="button" onclick="togglePasswordVisibility('password-input', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs p-1" title="Show/Hide Password">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="w-full neon-btn-primary py-3 rounded-xl font-bold text-sm text-slate-950 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-right-to-bracket"></i> <span id="auth-submit-text">Sign In &amp; Sync</span>
         </button>
       </form>
     </div>
@@ -468,9 +501,51 @@
       }
     }
 
-    function openLoginModal() {
+    let currentAuthMode = "login";
+
+    function setAuthMode(mode) {
+      currentAuthMode = mode;
+      const isReg = mode === "register";
+      const tabLogin = document.getElementById("auth-tab-login");
+      const tabReg = document.getElementById("auth-tab-register");
+      const title = document.getElementById("auth-modal-title");
+      const desc = document.getElementById("auth-modal-desc");
+      const submitText = document.getElementById("auth-submit-text");
+      if (tabLogin && tabReg) {
+        if (isReg) {
+          tabReg.className = "flex-1 py-2 rounded-lg text-xs font-bold transition text-cyan-300 bg-cyan-500/20 border border-cyan-500/30";
+          tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-slate-200";
+        } else {
+          tabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold transition text-cyan-300 bg-cyan-500/20 border border-cyan-500/30";
+          tabReg.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-slate-200";
+        }
+      }
+      if (title) title.textContent = isReg ? "Create GameVerse Account" : "Sign In to GameVerse";
+      if (desc) desc.textContent = isReg
+        ? "Create your unique gamer credentials. Your password is securely encrypted with PBKDF2 and stored in MongoDB Atlas."
+        : "Sign in with your username and password to sync your favorites and profile with the MongoDB Atlas database.";
+      if (submitText) submitText.textContent = isReg ? "Create Account & Sign In" : "Sign In & Sync";
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPassword = input.type === "password";
+      input.type = isPassword ? "text" : "password";
+      const icon = btn.querySelector("i");
+      if (icon) {
+        icon.className = isPassword ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
+      }
+    }
+
+    function openLoginModal(mode = "login") {
+      setAuthMode(mode);
       const modal = document.getElementById("login-modal");
-      if (modal) modal.classList.remove("hidden");
+      if (modal) {
+        modal.classList.remove("hidden");
+        const input = document.getElementById("username-input");
+        if (input) setTimeout(() => input.focus(), 50);
+      }
     }
 
     function closeLoginModal() {
@@ -480,22 +555,29 @@
 
     async function handleLoginSubmit(event) {
       event.preventDefault();
-      const input = document.getElementById("username-input");
-      const username = input ? input.value.trim() : "";
-      if (!username) return;
+      const uInput = document.getElementById("username-input");
+      const pInput = document.getElementById("password-input");
+      const username = uInput ? uInput.value.trim() : "";
+      const password = pInput ? pInput.value : "";
+      if (!username || !password) return;
 
       try {
         const res = await fetch("/api/auth", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, name: username })
+          body: JSON.stringify({ username, password, action: currentAuthMode, displayName: username })
         });
         const data = await res.json();
+        if (!res.ok || !data.success) {
+          showToast(data.error || "Authentication failed. Please check credentials.", "warning");
+          return;
+        }
+
         const userObj = data.user || { username, displayName: username };
         localStorage.setItem(USER_KEY, JSON.stringify(userObj));
         closeLoginModal();
         renderAuthHeader();
-        showToast("Welcome, " + (userObj.displayName || username) + "! Signed in successfully.", "success");
+        showToast(data.message || "Welcome, " + (userObj.displayName || username) + "!", "success");
       } catch {
         // Offline fallback
         const userObj = { username, displayName: username };

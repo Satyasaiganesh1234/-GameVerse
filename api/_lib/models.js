@@ -52,10 +52,12 @@ const ComparisonSchema = new mongoose.Schema(
 
 ComparisonSchema.index({ sessionId: 1 }, { unique: true });
 
-/* ─── User Schema (Simple Username Login) ─────────────────────── */
+/* ─── User Schema (Username & Password Authentication) ────────── */
 const UserSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true, index: true, lowercase: true, trim: true },
+    password: { type: String, required: true },
+    salt: { type: String, default: '' },
     displayName: { type: String, required: true, trim: true },
     avatar: { type: String, default: 'fa-gamepad' },
     favorites: { type: [Number], default: [] },
