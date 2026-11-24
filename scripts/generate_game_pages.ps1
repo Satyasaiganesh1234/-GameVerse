@@ -1,4 +1,4 @@
-# PowerShell Generator for 20 Dedicated GameVerse Web Pages
+﻿# PowerShell Generator for 20 Dedicated GameVerse Web Pages
 $gamesDir = "c:\Users\marth\.gemini\antigravity\scratch\GameVerse-Project\public\games"
 if (!(Test-Path $gamesDir)) {
     New-Item -ItemType Directory -Path $gamesDir -Force | Out-Null
@@ -788,25 +788,6 @@ foreach ($g in $games) {
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
-
-  <!-- TOP BANNER -->
-  <div class="bg-gradient-to-r from-slate-950 via-indigo-950/90 to-slate-950 border-b border-cyan-500/20 text-xs py-2 px-4">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-slate-300">
-      <div class="flex items-center gap-2">
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-400/30">
-          <i class="fa-solid fa-graduation-cap"></i> Academic SE &amp; System Design Project
-        </span>
-        <span class="hidden sm:inline text-slate-400">
-          Game #$($g.id) of 20 &bull; Dedicated Webpage
-        </span>
-      </div>
-      <div class="flex items-center gap-3">
-        <a href="../index.html" class="text-[11px] text-cyan-300 hover:text-white flex items-center gap-1 transition">
-          <i class="fa-solid fa-arrow-left"></i> Return to Main GameVerse Portal
-        </a>
-      </div>
-    </div>
-  </div>
 
   <!-- NAVIGATION HEADER -->
   <header class="sticky top-0 z-40 glass-panel border-b border-white/10">
