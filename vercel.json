@@ -1,12 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "regions": ["bom1"],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/public/$1" }
+    { "source": "/((?!api/).*)", "destination": "/public/$1" }
   ],
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 10
+      "maxDuration": 15
     }
   }
 }

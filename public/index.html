@@ -1420,7 +1420,16 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password, action: currentAuthMode, displayName: username })
         });
-        const data = await res.json();
+        
+        let data;
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error("Non-JSON API response from /api/auth:", res.status, res.statusText);
+          showToast(`Server returned HTTP ${res.status}. Check Vercel serverless function logs.`, "error");
+          return;
+        }
+
         if (!res.ok || !data.success) {
           showToast(data.error || "Authentication failed. Please check credentials.", "warning");
           return;
@@ -1440,17 +1449,14 @@
         closeLoginModal();
         renderAuthHeader();
         if (data.source === "local-fallback") {
-          showToast(data.message + " — MongoDB not connected on host. Add MONGODB_URI in Vercel settings.", "warning");
+          showToast(`Signed in locally (Database unreachable: ${data.dbNotice || 'Check MONGODB_URI in Vercel settings'})`, "warning");
         } else {
           showToast(data.message || `Welcome, ${userObj.displayName}!`, "success");
         }
         refreshAllViews();
       } catch (e) {
-        const userObj = { username, displayName: username, favorites: favoriteIds };
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userObj));
-        closeLoginModal();
-        renderAuthHeader();
-        showToast(`Signed in locally as ${username} (Offline Mode)`, "info");
+        console.error("Auth network error:", e);
+        showToast("Network error connecting to /api/auth: " + (e.message || "Failed to reach server"), "error");
       }
     }
 
