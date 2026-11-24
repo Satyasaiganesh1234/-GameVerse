@@ -509,51 +509,6 @@
             </div>
           </form>
 
-          <!-- Divider: Connect with Gamer Network -->
-          <div class="relative my-6 text-center">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-slate-800"></div>
-            </div>
-            <span
-              class="relative px-3 bg-cyber-card font-mono text-[10px] text-slate-500 uppercase tracking-widest">
-              OR CONNECT WITH GAMER NETWORK
-            </span>
-          </div>
-
-          <!-- Social Gamer Network Buttons -->
-          <div class="grid grid-cols-5 gap-2.5">
-            <!-- Discord -->
-            <button onclick="handleSocialAuth('Discord')"
-              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-indigo-400 text-slate-400 hover:text-indigo-400 transition hover:shadow-[0_0_15px_rgba(99,102,241,0.3)] flex items-center justify-center"
-              title="Authenticate via Discord">
-              <i class="fa-brands fa-discord text-base"></i>
-            </button>
-            <!-- Steam -->
-            <button onclick="handleSocialAuth('Steam')"
-              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-cyan-400 text-slate-400 hover:text-cyan-400 transition hover:shadow-[0_0_15px_rgba(0,242,254,0.3)] flex items-center justify-center"
-              title="Authenticate via Steam">
-              <i class="fa-brands fa-steam text-base"></i>
-            </button>
-            <!-- Twitch -->
-            <button onclick="handleSocialAuth('Twitch')"
-              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-purple-400 text-slate-400 hover:text-purple-400 transition hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] flex items-center justify-center"
-              title="Authenticate via Twitch">
-              <i class="fa-brands fa-twitch text-base"></i>
-            </button>
-            <!-- PlayStation Network -->
-            <button onclick="handleSocialAuth('PlayStation')"
-              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-blue-400 text-slate-400 hover:text-blue-400 transition hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] flex items-center justify-center"
-              title="Authenticate via PlayStation Network">
-              <i class="fa-brands fa-playstation text-base"></i>
-            </button>
-            <!-- Google -->
-            <button onclick="handleSocialAuth('Google')"
-              class="h-11 rounded-xl bg-cyber-dark border border-slate-800 hover:border-pink-400 text-slate-400 hover:text-pink-400 transition hover:shadow-[0_0_15px_rgba(255,0,127,0.3)] flex items-center justify-center"
-              title="Authenticate via Google">
-              <i class="fa-brands fa-google text-base"></i>
-            </button>
-          </div>
-
           <!-- Bottom Switch Link: Register / Login Toggle -->
           <div class="mt-6 text-center font-mono text-xs">
             <span id="switch-prompt" class="text-slate-400">New Player?</span>
@@ -739,15 +694,6 @@
     function handleForgotPassword() {
       playCyberSfx('beep');
       showAlert("To reset quantum credentials, please register a new neural ID or contact: admin@gameverse.metaverse", "info");
-    }
-
-    function handleSocialAuth(provider) {
-      playCyberSfx('beep');
-      const uInput = document.getElementById("username-input");
-      const pInput = document.getElementById("password-input");
-      if (uInput) uInput.value = `${provider}_Gamer#${Math.floor(1000 + Math.random() * 9000)}`;
-      if (pInput) pInput.value = "QuantumAuth2026!";
-      showAlert(`Authenticated via ${provider} Gamer Network. Ready to Initialize Login.`, "info");
     }
 
     function toggleSettingsModal() {
