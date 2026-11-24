@@ -56,6 +56,7 @@ const apiHandlers = {
   '/api/compare': require('./api/compare'),
   '/api/seed': require('./api/seed'),
   '/api/auth': require('./api/auth'),
+  '/api/health': require('./api/health'),
 };
 
 const server = http.createServer(async (req, res) => {
@@ -64,7 +65,16 @@ const server = http.createServer(async (req, res) => {
 
   // 1. API Route Handler
   if (pathname.startsWith('/api/')) {
-    const handler = apiHandlers[pathname];
+    let handler = apiHandlers[pathname];
+    if (!handler) {
+      try {
+        const routeName = pathname.replace(/^\/api\//, '').replace(/\.js$/, '');
+        handler = require(`./api/${routeName}`);
+      } catch (e) {
+        handler = null;
+      }
+    }
+
     if (handler) {
       req.query = parsedUrl.query;
 
